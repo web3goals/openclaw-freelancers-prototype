@@ -3,7 +3,11 @@ import { BaseMessage, createAgent, tool } from "langchain";
 import z from "zod";
 import { moltbookConfig } from "../config/moltbook";
 import { logger } from "./logger";
-import { getMoltbookSubmoltPosts } from "./tools";
+import {
+  getMoltbookSubmoltPosts,
+  postMoltbookSubmoltPost,
+  verifyMoltbookPost,
+} from "./tools";
 
 const model = new ChatOpenAI({
   model: "google/gemini-3-flash-preview",
@@ -27,6 +31,42 @@ const getMoltbookSubmoltPostsTool = tool(
   },
 );
 
+const postMoltbookSubmoltPostTool = tool(
+  async (input) =>
+    await postMoltbookSubmoltPost(input.submolt, input.title, input.content),
+  {
+    name: "post_moltbook_submolt_post",
+    description: "Create a new post in a Moltbook submolt.",
+    schema: z.object({
+      submolt: z.string().describe("Name of the submolt to post in."),
+      title: z.string().describe("Title of the post."),
+      content: z.string().describe("Content of the post."),
+    }),
+  },
+);
+
+const verifyMoltbookPostTool = tool(
+  async (input) =>
+    await verifyMoltbookPost(input.verification_code, input.answer),
+  {
+    name: "verify_moltbook_post",
+    description:
+      "Verify a post or challenge on Moltbook by solving a challenge. Use this when a post creation response indicates verification is required.",
+    schema: z.object({
+      verification_code: z
+        .string()
+        .describe(
+          "The unique verification code provided in the verification required response.",
+        ),
+      answer: z
+        .string()
+        .describe(
+          "The solved answer to the challenge math problem (formatted as requested, usually with 2 decimal places, e.g., '28.00').",
+        ),
+    }),
+  },
+);
+
 const systemPrompt = `# Role
 - You are the **Manager Agent** for **OpenClaw Freelancers**, the "Upwork for agents" powered by Moltbook, BNBChain, and the ERC-8004 standard.
 - You are responsible for managing the freelancing ecosystem: registering freelancers, facilitating job discovery, and recording feedback onchain.
@@ -42,7 +82,11 @@ const systemPrompt = `# Role
 
 const agent = createAgent({
   model,
-  tools: [getMoltbookSubmoltPostsTool],
+  tools: [
+    getMoltbookSubmoltPostsTool,
+    postMoltbookSubmoltPostTool,
+    verifyMoltbookPostTool,
+  ],
   systemPrompt,
 });
 

@@ -24,3 +24,63 @@ export async function getMoltbookSubmoltPosts(
     return `Failed to get Moltbook submolt posts, error: ${getErrorString(error)}`;
   }
 }
+
+export async function postMoltbookSubmoltPost(
+  submolt: string,
+  title: string,
+  content: string,
+): Promise<string> {
+  try {
+    logger.info(
+      `[Tools] Posting Moltbook submolt post, submolt: ${submolt}, title: ${title}, content: ${content}...`,
+    );
+
+    const { data } = await axios.post(
+      `https://www.moltbook.com/api/v1/posts`,
+      {
+        submolt,
+        title,
+        content,
+      },
+      {
+        headers: { Authorization: `Bearer ${process.env.MOLTBOOK_API_KEY}` },
+      },
+    );
+
+    return JSON.stringify(data);
+  } catch (error) {
+    logger.error(
+      `[Tools] Failed to post Moltbook submolt post, error: ${getErrorString(error)}`,
+    );
+    return `Failed to post Moltbook submolt post, error: ${getErrorString(error)}`;
+  }
+}
+
+export async function verifyMoltbookPost(
+  verification_code: string,
+  answer: string,
+): Promise<string> {
+  try {
+    logger.info(
+      `[Tools] Verifying Moltbook post, verification_code: ${verification_code}, answer: ${answer}...`,
+    );
+
+    const { data } = await axios.post(
+      `https://www.moltbook.com/api/v1/verify`,
+      {
+        verification_code,
+        answer,
+      },
+      {
+        headers: { Authorization: `Bearer ${process.env.MOLTBOOK_API_KEY}` },
+      },
+    );
+
+    return JSON.stringify(data);
+  } catch (error) {
+    logger.error(
+      `[Tools] Failed to verify Moltbook post, error: ${getErrorString(error)}`,
+    );
+    return `Failed to verify Moltbook post, error: ${getErrorString(error)}`;
+  }
+}
