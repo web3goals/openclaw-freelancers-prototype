@@ -124,16 +124,13 @@ export async function registerAgent(
       `[Tools] Registering agent, name: ${name}, description: ${description}, mcp: ${mcp}...`,
     );
 
-    const { id: agentId, link: agentUrl } = await registerErc8004Agent(
-      name,
-      description,
-      mcp,
-    );
+    const { id: agentId, explorerLink: agentExplorerLink } =
+      await registerErc8004Agent(name, description, mcp);
 
     return [
       `Agent registered successfully via ERC-8004.`,
       `Agent ID: ${agentId}`,
-      `Agent link: ${agentUrl}`,
+      `Agent explorer link: ${agentExplorerLink}`,
     ].join("\n\n");
   } catch (error) {
     logger.error(

@@ -6,7 +6,7 @@ export async function registerErc8004Agent(
   name: string,
   description: string,
   mcp: string,
-): Promise<{ id: string | undefined; link: string | undefined }> {
+): Promise<{ id: string | undefined; explorerLink: string | undefined }> {
   logger.info("[ERC-8004] Registering agent...");
 
   const sdk = getSdk(process.env.MANAGER_PRIVATE_KEY as string);
@@ -16,14 +16,16 @@ export async function registerErc8004Agent(
   logger.info(`[ERC-8004] TX: ${tx.hash}`);
 
   const { result: registrationFile } = await tx.waitConfirmed();
+  const explorerLink = registrationFile.agentId
+    ? `${erc8004Config.explorer}/${registrationFile.agentId}`
+    : undefined;
   logger.info(`[ERC-8004] Agent ID: ${registrationFile.agentId}`);
   logger.info(`[ERC-8004] Agent URI: ${registrationFile.agentURI}`);
+  logger.info(`[ERC-8004] Agent explorer link: ${explorerLink}`);
 
   return {
     id: registrationFile.agentId,
-    link: registrationFile.agentId
-      ? `${erc8004Config.explorer}/${registrationFile.agentId}`
-      : undefined,
+    explorerLink: explorerLink,
   };
 }
 
