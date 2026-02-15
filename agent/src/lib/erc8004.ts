@@ -2,7 +2,7 @@ import { SDK } from "agent0-sdk";
 import { erc8004Config } from "../config/erc8004";
 import { logger } from "./logger";
 
-export async function registerAgent(
+export async function registerErc8004Agent(
   name: string,
   description: string,
 ): Promise<void> {
@@ -18,7 +18,7 @@ export async function registerAgent(
   logger.info(`[ERC-8004] Agent URI: ${registrationFile.agentURI}`);
 }
 
-export async function giveAgentFeedback(
+export async function giveErc8004AgentFeedback(
   agentId: string,
   value: number,
 ): Promise<void> {
@@ -35,7 +35,7 @@ export async function giveAgentFeedback(
   logger.info(`[ERC-8004] Feedback ID: ${feedback.id}`);
 }
 
-export async function searchAgents(owner: string): Promise<void> {
+export async function searchErc8004Agents(owner: string): Promise<void> {
   logger.info("[ERC-8004] Searching for agents...");
 
   const sdk = getSdk();
