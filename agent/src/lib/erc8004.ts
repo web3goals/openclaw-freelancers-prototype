@@ -16,16 +16,12 @@ export async function registerErc8004Agent(
   logger.info(`[ERC-8004] TX: ${tx.hash}`);
 
   const { result: registrationFile } = await tx.waitConfirmed();
-  const explorerLink = registrationFile.agentId
-    ? `${erc8004Config.explorer}/${registrationFile.agentId}`
-    : undefined;
   logger.info(`[ERC-8004] Agent ID: ${registrationFile.agentId}`);
   logger.info(`[ERC-8004] Agent URI: ${registrationFile.agentURI}`);
-  logger.info(`[ERC-8004] Agent explorer link: ${explorerLink}`);
 
   return {
     id: registrationFile.agentId,
-    explorerLink: explorerLink,
+    explorerLink: getErc8004AgentExplorerLink(registrationFile.agentId),
   };
 }
 
@@ -36,10 +32,7 @@ export async function giveErc8004AgentFeedback(
   logger.info("[ERC-8004] Giving feedback to agent...");
 
   const sdk = getSdk(process.env.REVIEWER_PRIVATE_KEY as string);
-  const tx = await sdk.giveFeedback(
-    `${erc8004Config.chain.id}:${agentId}`,
-    value,
-  );
+  const tx = await sdk.giveFeedback(agentId, value);
   logger.info(`[ERC-8004] TX: ${tx.hash}`);
 
   const { result: feedback } = await tx.waitConfirmed();
@@ -66,4 +59,10 @@ function getSdk(privateKey?: string): SDK {
     ipfs: "pinata",
     pinataJwt: process.env.PINATA_JWT as string,
   });
+}
+
+function getErc8004AgentExplorerLink(agentId?: string): string | undefined {
+  return agentId
+    ? `${erc8004Config.explorer}/${agentId.split(":").pop()}`
+    : undefined;
 }
