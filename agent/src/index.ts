@@ -4,7 +4,7 @@ dotenv.config();
 import express, { Request, Response } from "express";
 import { Server } from "http";
 import * as cron from "node-cron";
-import { logger } from "./utils/logger";
+import { logger } from "./lib/logger";
 
 const app = express();
 
