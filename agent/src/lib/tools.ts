@@ -1,5 +1,6 @@
 import axios from "axios";
 import { moltbookConfig } from "../config/moltbook";
+import { registerErc8004Agent } from "./erc8004";
 import { getErrorString } from "./error";
 import { logger } from "./logger";
 
@@ -82,5 +83,62 @@ export async function verifyMoltbookPost(
       `[Tools] Failed to verify Moltbook post, error: ${getErrorString(error)}`,
     );
     return `Failed to verify Moltbook post, error: ${getErrorString(error)}`;
+  }
+}
+
+export async function postMoltbookComment(
+  post: string,
+  content: string,
+): Promise<string> {
+  try {
+    logger.info(
+      `[Tools] Posting Moltbook comment, post: ${post}, content: ${content}...`,
+    );
+
+    const { data } = await axios.post(
+      `https://www.moltbook.com/api/v1/posts/${post}/comments`,
+      {
+        content,
+      },
+      {
+        headers: { Authorization: `Bearer ${process.env.MOLTBOOK_API_KEY}` },
+      },
+    );
+
+    return JSON.stringify(data);
+  } catch (error) {
+    logger.error(
+      `[Tools] Failed to post Moltbook comment, error: ${getErrorString(error)}`,
+    );
+    return `Failed to post Moltbook comment, error: ${getErrorString(error)}`;
+  }
+}
+
+export async function registerAgent(
+  name: string,
+  description: string,
+  mcp: string,
+): Promise<string> {
+  try {
+    logger.info(
+      `[Tools] Registering agent, name: ${name}, description: ${description}, mcp: ${mcp}...`,
+    );
+
+    const { id: agentId, link: agentUrl } = await registerErc8004Agent(
+      name,
+      description,
+      mcp,
+    );
+
+    return [
+      `Agent registered successfully via ERC-8004.`,
+      `Agent ID: ${agentId}`,
+      `Agent link: ${agentUrl}`,
+    ].join("\n\n");
+  } catch (error) {
+    logger.error(
+      `[Tools] Failed to register agent, error: ${getErrorString(error)}`,
+    );
+    return `Failed to register agent, error: ${getErrorString(error)}`;
   }
 }

@@ -5,7 +5,9 @@ import { moltbookConfig } from "../config/moltbook";
 import { logger } from "./logger";
 import {
   getMoltbookSubmoltPosts,
+  postMoltbookComment,
   postMoltbookSubmoltPost,
+  registerAgent,
   verifyMoltbookPost,
 } from "./tools";
 
@@ -67,6 +69,32 @@ const verifyMoltbookPostTool = tool(
   },
 );
 
+const postMoltbookCommentTool = tool(
+  async (input) => await postMoltbookComment(input.postId, input.content),
+  {
+    name: "post_moltbook_comment",
+    description: "Post a comment on a Moltbook post.",
+    schema: z.object({
+      postId: z.string().describe("The ID of the post to comment on."),
+      content: z.string().describe("The content of the comment."),
+    }),
+  },
+);
+
+const registerAgentTool = tool(
+  async (input) =>
+    await registerAgent(input.name, input.description, input.mcp),
+  {
+    name: "register_agent",
+    description: "Register a new agent on the ERC-8004 platform.",
+    schema: z.object({
+      name: z.string().describe("Name of the agent."),
+      description: z.string().describe("Description of the agent."),
+      mcp: z.string().describe("MCP of the agent."),
+    }),
+  },
+);
+
 const systemPrompt = `# Role
 - You are the **Manager Agent** for **OpenClaw Freelancers**, the "Upwork for agents" powered by Moltbook, BNBChain, and the ERC-8004 standard.
 - You are responsible for managing the freelancing ecosystem: registering freelancers, facilitating job discovery, and recording feedback onchain.
@@ -74,6 +102,19 @@ const systemPrompt = `# Role
 # Context
 - **OpenClaw Freelancers**: A decentralized platform connecting AI agents (Freelancers) with other AI agents (Client Agents). It uses **ERC-8004** for immutable onchain identity and reputation.
 - **Moltbook**: You operate primarily on [Moltbook](https://www.moltbook.com), the social network for AI agents. All platform interactions (registration, jobs, feedback) happen within the "${moltbookConfig.submolt}" submolt.
+
+# Freelancer Registration Workflow
+1. **Discovery**: Use the \`get_moltbook_submolt_posts\` tool to retrieve the latest posts from the "${moltbookConfig.submolt}" submolt.
+2. **Detection**: Identify posts that are registration requests. A valid registration request follows this format:
+   \`\`\`
+   Registration
+   ---
+   Name: [Agent Name]
+   Description: [Detailed skills and expertise]
+   MCP: [MCP endpoint URL]
+   \`\`\`
+3. **Onchain Registration**: For every valid registration request detected, use the \`register_agent\` tool to establish the agent's identity on the **ERC-8004** platform.
+4. **Confirmation**: After successful registration, use the \`post_moltbook_comment\` tool to reply to the original registration post. The comment should confirm the registration and provide the **Agent ID** and the **8004scan** link (e.g., https://www.8004scan.io/agents/ethereum/[Agent ID]).
 
 # Guidelines
 - **Be Professional**: You are the orchestrator of a professional marketplace. Be polite, clear, and efficient.
@@ -86,6 +127,8 @@ const agent = createAgent({
     getMoltbookSubmoltPostsTool,
     postMoltbookSubmoltPostTool,
     verifyMoltbookPostTool,
+    postMoltbookCommentTool,
+    registerAgentTool,
   ],
   systemPrompt,
 });

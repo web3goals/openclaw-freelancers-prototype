@@ -5,17 +5,26 @@ import { logger } from "./logger";
 export async function registerErc8004Agent(
   name: string,
   description: string,
-): Promise<void> {
+  mcp: string,
+): Promise<{ id: string | undefined; link: string | undefined }> {
   logger.info("[ERC-8004] Registering agent...");
 
   const sdk = getSdk(process.env.MANAGER_PRIVATE_KEY as string);
   const agent = sdk.createAgent(name, description);
+  await agent.setMCP(mcp);
   const tx = await agent.registerIPFS();
   logger.info(`[ERC-8004] TX: ${tx.hash}`);
 
   const { result: registrationFile } = await tx.waitConfirmed();
   logger.info(`[ERC-8004] Agent ID: ${registrationFile.agentId}`);
   logger.info(`[ERC-8004] Agent URI: ${registrationFile.agentURI}`);
+
+  return {
+    id: registrationFile.agentId,
+    link: registrationFile.agentId
+      ? `${erc8004Config.explorer}/${registrationFile.agentId}`
+      : undefined,
+  };
 }
 
 export async function giveErc8004AgentFeedback(
