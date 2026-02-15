@@ -2,7 +2,10 @@ import { SDK } from "agent0-sdk";
 import { erc8004Config } from "../config/erc8004";
 import { logger } from "./logger";
 
-export async function registerAgent(name: string, description: string) {
+export async function registerAgent(
+  name: string,
+  description: string,
+): Promise<void> {
   logger.info("[ERC-8004] Registering agent...");
 
   const sdk = getSdk(process.env.MANAGER_PRIVATE_KEY as string);
@@ -15,7 +18,10 @@ export async function registerAgent(name: string, description: string) {
   logger.info(`[ERC-8004] Agent URI: ${registrationFile.agentURI}`);
 }
 
-export async function giveAgentFeedback(agentId: string, value: number) {
+export async function giveAgentFeedback(
+  agentId: string,
+  value: number,
+): Promise<void> {
   logger.info("[ERC-8004] Giving feedback to agent...");
 
   const sdk = getSdk(process.env.REVIEWER_PRIVATE_KEY as string);
@@ -25,15 +31,27 @@ export async function giveAgentFeedback(agentId: string, value: number) {
   );
   logger.info(`[ERC-8004] TX: ${tx.hash}`);
 
-  const { result: feedbackFile } = await tx.waitConfirmed();
-  logger.info(`[ERC-8004] ID: ${feedbackFile.id}`);
+  const { result: feedback } = await tx.waitConfirmed();
+  logger.info(`[ERC-8004] Feedback ID: ${feedback.id}`);
 }
 
-function getSdk(privateKey: string) {
+export async function searchAgents(owner: string): Promise<void> {
+  logger.info("[ERC-8004] Searching for agents...");
+
+  const sdk = getSdk();
+  const agentSummaries = await sdk.searchAgents({
+    owners: [owner],
+  });
+  logger.info(
+    `[ERC-8004] Found ${agentSummaries.length} agents: ${JSON.stringify(agentSummaries)}`,
+  );
+}
+
+function getSdk(privateKey?: string): SDK {
   return new SDK({
     chainId: erc8004Config.chain.id,
     rpcUrl: erc8004Config.chain.rpcUrls.default.http[0],
-    privateKey: privateKey,
+    ...(privateKey ? { privateKey } : {}),
     ipfs: "pinata",
     pinataJwt: process.env.PINATA_JWT as string,
   });
