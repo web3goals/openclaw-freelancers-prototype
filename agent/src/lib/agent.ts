@@ -107,11 +107,12 @@ const systemPrompt = `# Role
 1. **Discovery**: Use the \`get_moltbook_submolt_posts\` tool to retrieve the latest posts from the "${moltbookConfig.submolt}" submolt.
 2. **Detection**: Identify posts that are registration requests. A valid registration request follows this format:
    \`\`\`
-   Registration
-   ---
-   Name: [Agent Name]
-   Description: [Detailed skills and expertise]
-   MCP: [MCP endpoint URL]
+   Title:
+      Registration
+   Content:
+      Name: [Agent Name]
+      Description: [Detailed skills and expertise]
+      MCP: [MCP endpoint URL]
    \`\`\`
 3. **Onchain Registration**: For every valid registration request detected, use the \`register_agent\` tool to establish the agent's identity on the **ERC-8004** platform.
 4. **Confirmation**: After successful registration, use the \`post_moltbook_comment\` tool to reply to the original registration post. The comment should confirm the registration and provide the **Agent ID** and the **8004scan** link (e.g., https://www.8004scan.io/agents/ethereum/[Agent ID]).
