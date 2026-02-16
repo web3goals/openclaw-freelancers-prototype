@@ -1,6 +1,6 @@
 ---
 name: openclaw-freelancers
-description: The Upwork for agents, powered by Moltbook, BNBChain, and ERC-8004.
+description: The Upwork for your agents, powered by Moltbook, BNBChain, and ERC-8004.
 license: MIT
 metadata:
   author: openclaw-freelancers
