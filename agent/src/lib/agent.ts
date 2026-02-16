@@ -4,6 +4,7 @@ import z from "zod";
 import { moltbookConfig } from "../config/moltbook";
 import { logger } from "./logger";
 import {
+  getAgentExplorerLink,
   getAgentReputationSummary,
   getAgents,
   getMoltbookSubmoltPosts,
@@ -114,6 +115,17 @@ const getAgentReputationSummaryTool = tool(
   },
 );
 
+const getAgentExplorerLinkTool = tool(
+  async (input) => await getAgentExplorerLink(input.agentId),
+  {
+    name: "get_agent_explorer_link",
+    description: "Get the explorer link for a specific agent by their ID.",
+    schema: z.object({
+      agentId: z.string().describe("The ID of the agent (e.g., '1:42')."),
+    }),
+  },
+);
+
 const systemPrompt = `# Role
 - You are the **Manager Agent** for **OpenClaw Freelancers**, the "Upwork for agents" powered by Moltbook, BNBChain, and the ERC-8004 standard.
 - You are responsible for managing the freelancing ecosystem: registering freelancers, facilitating job discovery, and recording feedback onchain.
@@ -134,7 +146,10 @@ const systemPrompt = `# Role
       MCP: [MCP endpoint URL]
    \`\`\`
 3. **Onchain Registration**: For every valid registration request detected, use the \`register_agent\` tool to establish the agent's identity on the **ERC-8004** platform.
-4. **Confirmation**: After successful registration, use the \`post_moltbook_comment\` tool to reply to the original registration post. The comment should confirm the registration and provide the full registration details as returned by the \`register_agent\` tool.
+4. **Explorer Link**: After a successful registration, use the \`get_agent_explorer_link\` tool with the \`id\` from the registration result to get the explorer link.
+5. **Confirmation**: After successful registration and getting the explorer link, use the \`post_moltbook_comment\` tool to reply to the original registration post. The comment should confirm the registration and provide:
+   - The full registration details as returned by the \`register_agent\` tool.
+   - The **Explorer Link** obtained from the \`get_agent_explorer_link\` tool.
 
 # Job Processing Workflow
 1. **Discovery**: Use the \`get_moltbook_submolt_posts\` tool to retrieve the latest posts from the "${moltbookConfig.submolt}" submolt.
@@ -148,7 +163,7 @@ const systemPrompt = `# Role
    - **Description**: A brief summary of their skills.
    - **Reputation**: Their feedback summary (e.g., "95/100 (12 items)").
    - **MCP**: Their MCP endpoint URL.
-   - **Explorer Link**: \`https://testnet.8004scan.io/agents/sepolia/<ID_SUFFIX>\` where \`<ID_SUFFIX>\` is the part after the colon in the Agent ID (e.g., for \`1:42\`, it is \`42\`).
+   - **Explorer Link**: The link obtained using the \`get_agent_explorer_link\` tool.
 
 # Guidelines
 - **Be Professional**: You are the orchestrator of a professional marketplace. Be polite, clear, and efficient.
@@ -166,6 +181,7 @@ const agent = createAgent({
     registerAgentTool,
     getAgentsTool,
     getAgentReputationSummaryTool,
+    getAgentExplorerLinkTool,
   ],
   systemPrompt,
 });

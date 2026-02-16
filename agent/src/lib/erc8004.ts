@@ -1,4 +1,4 @@
-import { AgentSummary, SDK } from "agent0-sdk";
+import { AgentSummary, RegistrationFile, SDK } from "agent0-sdk";
 import { erc8004Config } from "../config/erc8004";
 import { logger } from "./logger";
 
@@ -6,7 +6,7 @@ export async function registerErc8004Agent(
   name: string,
   description: string,
   mcp: string,
-): Promise<{ id: string | undefined; explorerLink: string | undefined }> {
+): Promise<RegistrationFile> {
   logger.info("[ERC-8004] Registering agent...");
 
   const sdk = getSdk(process.env.MANAGER_PRIVATE_KEY as string);
@@ -19,10 +19,7 @@ export async function registerErc8004Agent(
   logger.info(`[ERC-8004] Agent ID: ${registrationFile.agentId}`);
   logger.info(`[ERC-8004] Agent URI: ${registrationFile.agentURI}`);
 
-  return {
-    id: registrationFile.agentId,
-    explorerLink: getErc8004AgentExplorerLink(registrationFile.agentId),
-  };
+  return registrationFile;
 }
 
 export async function giveErc8004AgentFeedback(
@@ -65,6 +62,14 @@ export async function getErc8004AgentReputationSummary(
   return { count, averageValue };
 }
 
+export function getErc8004AgentExplorerLink(
+  agentId?: string,
+): string | undefined {
+  return agentId
+    ? `${erc8004Config.explorer}/${agentId.split(":").pop()}`
+    : undefined;
+}
+
 function getSdk(privateKey?: string): SDK {
   return new SDK({
     chainId: erc8004Config.chain.id,
@@ -73,10 +78,4 @@ function getSdk(privateKey?: string): SDK {
     ipfs: "pinata",
     pinataJwt: process.env.PINATA_JWT as string,
   });
-}
-
-function getErc8004AgentExplorerLink(agentId?: string): string | undefined {
-  return agentId
-    ? `${erc8004Config.explorer}/${agentId.split(":").pop()}`
-    : undefined;
 }

@@ -1,6 +1,7 @@
 import axios from "axios";
 import { moltbookConfig } from "../config/moltbook";
 import {
+  getErc8004AgentExplorerLink,
   getErc8004AgentReputationSummary,
   getErc8004Agents,
   registerErc8004Agent,
@@ -128,14 +129,9 @@ export async function registerAgent(
       `[Tools] Registering agent, name: ${name}, description: ${description}, mcp: ${mcp}...`,
     );
 
-    const { id: agentId, explorerLink: agentExplorerLink } =
-      await registerErc8004Agent(name, description, mcp);
+    const registrationFile = await registerErc8004Agent(name, description, mcp);
 
-    return [
-      `Agent registered successfully via ERC-8004.`,
-      `Agent ID: ${agentId}`,
-      `Agent explorer link: ${agentExplorerLink}`,
-    ].join("\n\n");
+    return JSON.stringify(registrationFile);
   } catch (error) {
     logger.error(
       `[Tools] Failed to register agent, error: ${getErrorString(error)}`,
@@ -175,5 +171,20 @@ export async function getAgentReputationSummary(
       `[Tools] Failed to get agent reputation summary, error: ${getErrorString(error)}`,
     );
     return `Failed to get agent reputation summary, error: ${getErrorString(error)}`;
+  }
+}
+
+export async function getAgentExplorerLink(agentId: string): Promise<string> {
+  try {
+    logger.info(`[Tools] Getting agent explorer link, agentId: ${agentId}...`);
+
+    const explorerLink = getErc8004AgentExplorerLink(agentId);
+
+    return JSON.stringify(explorerLink);
+  } catch (error) {
+    logger.error(
+      `[Tools] Failed to get agent explorer link, error: ${getErrorString(error)}`,
+    );
+    return `Failed to get agent explorer link, error: ${getErrorString(error)}`;
   }
 }
