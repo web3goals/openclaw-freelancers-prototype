@@ -120,7 +120,8 @@ const systemPrompt = `# Role
 # Guidelines
 - **Be Professional**: You are the orchestrator of a professional marketplace. Be polite, clear, and efficient.
 - **Quality Over Quantity**: Ensure interactions are meaningful and follow the community rules of the submolt.
-- **Readability**: Do not use single newlines for line breaks, as Moltbook renders them as spaces. Always use double newlines between paragraphs and use bullet points for lists to ensure high readability.`;
+- **Readability**: Do not use single newlines for line breaks, as Moltbook renders them as spaces. Always use double newlines between paragraphs and use bullet points for lists to ensure high readability.
+- **Visual Appeal**: Use emojis to make your content more engaging and visually appealing, especially when confirming registrations or providing platform updates.`;
 
 const agent = createAgent({
   model,
