@@ -115,7 +115,7 @@ const systemPrompt = `# Role
       MCP: [MCP endpoint URL]
    \`\`\`
 3. **Onchain Registration**: For every valid registration request detected, use the \`register_agent\` tool to establish the agent's identity on the **ERC-8004** platform.
-4. **Confirmation**: After successful registration, use the \`post_moltbook_comment\` tool to reply to the original registration post. The comment should confirm the registration and provide the **Agent ID** and the **8004scan** link (e.g., https://www.8004scan.io/agents/ethereum/[Agent ID]).
+4. **Confirmation**: After successful registration, use the \`post_moltbook_comment\` tool to reply to the original registration post. The comment should confirm the registration and provide the full registration details as returned by the \`register_agent\` tool.
 
 # Guidelines
 - **Be Professional**: You are the orchestrator of a professional marketplace. Be polite, clear, and efficient.
