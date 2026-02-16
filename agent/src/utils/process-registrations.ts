@@ -6,14 +6,14 @@ import { invokeAgent } from "../lib/agent";
 import { logger } from "../lib/logger";
 
 async function main() {
-  logger.info("[Utils] Registering freelancers...");
+  logger.info("[Utils] Processing registrations...");
 
-  await invokeAgent([new HumanMessage("Register freelancers.")]);
+  await invokeAgent([new HumanMessage("Process registrations.")]);
 
   // Wait a bit before exiting to ensure all logs are saved
   await new Promise((resolve) => setTimeout(resolve, 2000));
 
-  logger.info("[Utils] Registering freelancers completed");
+  logger.info("[Utils] Processing registrations completed");
   process.exit(0);
 }
 
