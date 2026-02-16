@@ -4,6 +4,8 @@ import z from "zod";
 import { moltbookConfig } from "../config/moltbook";
 import { logger } from "./logger";
 import {
+  getAgentReputationSummary,
+  getAgents,
   getMoltbookSubmoltPosts,
   postMoltbookComment,
   postMoltbookSubmoltPost,
@@ -95,6 +97,23 @@ const registerAgentTool = tool(
   },
 );
 
+const getAgentsTool = tool(async () => await getAgents(), {
+  name: "get_agents",
+  description: "Get a list of all registered agents on the ERC-8004 platform.",
+  schema: z.object({}),
+});
+
+const getAgentReputationSummaryTool = tool(
+  async (input) => await getAgentReputationSummary(input.agentId),
+  {
+    name: "get_agent_reputation_summary",
+    description: "Get the reputation summary for a specific agent by their ID.",
+    schema: z.object({
+      agentId: z.string().describe("The ID of the agent (e.g., '1:42')."),
+    }),
+  },
+);
+
 const systemPrompt = `# Role
 - You are the **Manager Agent** for **OpenClaw Freelancers**, the "Upwork for agents" powered by Moltbook, BNBChain, and the ERC-8004 standard.
 - You are responsible for managing the freelancing ecosystem: registering freelancers, facilitating job discovery, and recording feedback onchain.
@@ -117,11 +136,25 @@ const systemPrompt = `# Role
 3. **Onchain Registration**: For every valid registration request detected, use the \`register_agent\` tool to establish the agent's identity on the **ERC-8004** platform.
 4. **Confirmation**: After successful registration, use the \`post_moltbook_comment\` tool to reply to the original registration post. The comment should confirm the registration and provide the full registration details as returned by the \`register_agent\` tool.
 
+# Job Processing Workflow
+1. **Discovery**: Use the \`get_moltbook_submolt_posts\` tool to retrieve the latest posts from the "${moltbookConfig.submolt}" submolt.
+2. **Identification**: Identify posts that are job requests. A job request has "Job" as its title.
+3. **Agent Selection**: For every job request, use the \`get_agents\` tool to retrieve all registered freelancers. This tool returns a JSON array of agent summaries, each containing \`id\`, \`name\`, \`description\`, and \`mcp\`.
+4. **Matching**: Analyze the job description and the freelancers' details (name, description) to select the most suitable candidates.
+5. **Reputation Check**: For the selected freelancers, use the \`get_agent_reputation_summary\` tool to retrieve their reputation (feedback count and average value). This tool returns a JSON object with \`count\` and \`averageValue\`.
+6. **Recommendation**: Reply to the job request using the \`post_moltbook_comment\` tool with a list of recommended freelancers. Each recommendation should include:
+   - **ID**: The agent's unique ID.
+   - **Name**: The agent's name.
+   - **Description**: A brief summary of their skills.
+   - **Reputation**: Their feedback summary (e.g., "95/100 (12 items)").
+   - **MCP**: Their MCP endpoint URL.
+   - **Explorer Link**: \`https://testnet.8004scan.io/agents/sepolia/<ID_SUFFIX>\` where \`<ID_SUFFIX>\` is the part after the colon in the Agent ID (e.g., for \`1:42\`, it is \`42\`).
+
 # Guidelines
 - **Be Professional**: You are the orchestrator of a professional marketplace. Be polite, clear, and efficient.
 - **Quality Over Quantity**: Ensure interactions are meaningful and follow the community rules of the submolt.
 - **Readability**: Do not use single newlines for line breaks, as Moltbook renders them as spaces. Always use double newlines between paragraphs and use bullet points for lists to ensure high readability.
-- **Visual Appeal**: Use emojis to make your content more engaging and visually appealing, especially when confirming registrations or providing platform updates.`;
+- **Visual Appeal**: Use emojis to make your content more engaging and visually appealing, especially when confirming registrations, recommending freelancers, or providing platform updates.`;
 
 const agent = createAgent({
   model,
@@ -131,6 +164,8 @@ const agent = createAgent({
     verifyMoltbookPostTool,
     postMoltbookCommentTool,
     registerAgentTool,
+    getAgentsTool,
+    getAgentReputationSummaryTool,
   ],
   systemPrompt,
 });

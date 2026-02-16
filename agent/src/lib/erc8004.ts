@@ -1,4 +1,4 @@
-import { SDK } from "agent0-sdk";
+import { AgentSummary, SDK } from "agent0-sdk";
 import { erc8004Config } from "../config/erc8004";
 import { logger } from "./logger";
 
@@ -39,16 +39,30 @@ export async function giveErc8004AgentFeedback(
   logger.info(`[ERC-8004] Feedback ID: ${feedback.id}`);
 }
 
-export async function searchErc8004Agents(owner: string): Promise<void> {
-  logger.info("[ERC-8004] Searching for agents...");
+export async function getErc8004Agents(): Promise<AgentSummary[]> {
+  logger.info("[ERC-8004] Getting agents...");
 
   const sdk = getSdk();
   const agentSummaries = await sdk.searchAgents({
-    owners: [owner],
+    owners: [process.env.MANAGER_ADDRESS as string],
   });
+  logger.info(`[ERC-8004] Found ${agentSummaries.length} agents`);
+
+  return agentSummaries;
+}
+
+export async function getErc8004AgentReputationSummary(
+  agentId: string,
+): Promise<{ count: number; averageValue: number }> {
+  logger.info("[ERC-8004] Getting agent reputation summary...");
+
+  const sdk = getSdk();
+  const { count, averageValue } = await sdk.getReputationSummary(agentId);
   logger.info(
-    `[ERC-8004] Found ${agentSummaries.length} agents: ${JSON.stringify(agentSummaries)}`,
+    `[ERC-8004] Agent ${agentId} has ${count} feedback entries with an average value of ${averageValue}`,
   );
+
+  return { count, averageValue };
 }
 
 function getSdk(privateKey?: string): SDK {

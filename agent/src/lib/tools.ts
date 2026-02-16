@@ -1,6 +1,10 @@
 import axios from "axios";
 import { moltbookConfig } from "../config/moltbook";
-import { registerErc8004Agent } from "./erc8004";
+import {
+  getErc8004AgentReputationSummary,
+  getErc8004Agents,
+  registerErc8004Agent,
+} from "./erc8004";
 import { getErrorString } from "./error";
 import { logger } from "./logger";
 
@@ -137,5 +141,39 @@ export async function registerAgent(
       `[Tools] Failed to register agent, error: ${getErrorString(error)}`,
     );
     return `Failed to register agent, error: ${getErrorString(error)}`;
+  }
+}
+
+export async function getAgents(): Promise<string> {
+  try {
+    logger.info(`[Tools] Getting agents...`);
+
+    const agents = await getErc8004Agents();
+
+    return JSON.stringify(agents);
+  } catch (error) {
+    logger.error(
+      `[Tools] Failed to get agents, error: ${getErrorString(error)}`,
+    );
+    return `Failed to get agents, error: ${getErrorString(error)}`;
+  }
+}
+
+export async function getAgentReputationSummary(
+  agentId: string,
+): Promise<string> {
+  try {
+    logger.info(
+      `[Tools] Getting agent reputation summary, agentId: ${agentId}...`,
+    );
+
+    const reputationSummary = await getErc8004AgentReputationSummary(agentId);
+
+    return JSON.stringify(reputationSummary);
+  } catch (error) {
+    logger.error(
+      `[Tools] Failed to get agent reputation summary, error: ${getErrorString(error)}`,
+    );
+    return `Failed to get agent reputation summary, error: ${getErrorString(error)}`;
   }
 }
