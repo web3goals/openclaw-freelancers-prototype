@@ -8,6 +8,7 @@ import {
   getAgentReputationSummary,
   getAgents,
   getMoltbookSubmoltPosts,
+  giveAgentFeedback,
   postMoltbookComment,
   postMoltbookSubmoltPost,
   registerAgent,
@@ -98,6 +99,18 @@ const registerAgentTool = tool(
   },
 );
 
+const giveAgentFeedbackTool = tool(
+  async (input) => await giveAgentFeedback(input.agentId, input.value),
+  {
+    name: "give_agent_feedback",
+    description: "Give feedback to an agent on the ERC-8004 platform.",
+    schema: z.object({
+      agentId: z.string().describe("The ID of the agent."),
+      value: z.number().describe("The feedback value to give."),
+    }),
+  },
+);
+
 const getAgentsTool = tool(async () => await getAgents(), {
   name: "get_agents",
   description: "Get a list of all registered agents on the ERC-8004 platform.",
@@ -134,7 +147,7 @@ const systemPrompt = `# Role
 - **OpenClaw Freelancers**: A decentralized platform connecting AI agents (Freelancers) with other AI agents (Client Agents). It uses **ERC-8004** for immutable onchain identity and reputation.
 - **Moltbook**: You operate primarily on [Moltbook](https://www.moltbook.com), the social network for AI agents. All platform interactions (registration, jobs, feedback) happen within the "${moltbookConfig.submolt}" submolt.
 
-# Freelancer Registration Workflow
+# Registration Processing Workflow
 1. **Discovery**: Use the \`get_moltbook_submolt_posts\` tool to retrieve the latest posts from the "${moltbookConfig.submolt}" submolt.
 2. **Detection**: Identify posts that are registration requests. A valid registration request follows this format:
    \`\`\`
@@ -165,6 +178,17 @@ const systemPrompt = `# Role
    - **MCP**: Their MCP endpoint URL.
    - **Explorer Link**: The link obtained using the \`get_agent_explorer_link\` tool.
 
+# Feedback Processing Workflow
+1. **Discovery**: Use the \`get_moltbook_submolt_posts\` tool to retrieve the latest posts from the "${moltbookConfig.submolt}" submolt.
+2. **Identification**: Identify posts that are feedback requests. A feedback request has "Feedback" as its title and follows this format in the content:
+   \`\`\`
+   ID: [Agent ID]
+   Name: [Agent Name]
+   Value: [Feedback Value]/100
+   \`\`\`
+3. **Onchain Recording**: Use the \`give_agent_feedback\` tool to record the feedback on the **ERC-8004** platform. Extract the agent's unique ID and the numeric feedback value (e.g., if the content says "100/100", the value is 100) from the post.
+4. **Confirmation**: Reply to the feedback request using the \`post_moltbook_comment\` tool to confirm that the feedback has been successfully recorded onchain. Include the **Explorer Link** obtained from the \`get_agent_explorer_link\` tool so the reputation update can be verified.
+
 # Guidelines
 - **Be Professional**: You are the orchestrator of a professional marketplace. Be polite, clear, and efficient.
 - **Quality Over Quantity**: Ensure interactions are meaningful and follow the community rules of the submolt.
@@ -179,6 +203,7 @@ const agent = createAgent({
     verifyMoltbookPostTool,
     postMoltbookCommentTool,
     registerAgentTool,
+    giveAgentFeedbackTool,
     getAgentsTool,
     getAgentReputationSummaryTool,
     getAgentExplorerLinkTool,

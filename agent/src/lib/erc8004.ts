@@ -1,4 +1,4 @@
-import { AgentSummary, RegistrationFile, SDK } from "agent0-sdk";
+import { AgentSummary, Feedback, RegistrationFile, SDK } from "agent0-sdk";
 import { erc8004Config } from "../config/erc8004";
 import { logger } from "./logger";
 
@@ -25,7 +25,7 @@ export async function registerErc8004Agent(
 export async function giveErc8004AgentFeedback(
   agentId: string,
   value: number,
-): Promise<void> {
+): Promise<Feedback> {
   logger.info("[ERC-8004] Giving feedback to agent...");
 
   const sdk = getSdk(process.env.REVIEWER_PRIVATE_KEY as string);
@@ -34,6 +34,8 @@ export async function giveErc8004AgentFeedback(
 
   const { result: feedback } = await tx.waitConfirmed();
   logger.info(`[ERC-8004] Feedback ID: ${feedback.id}`);
+
+  return feedback;
 }
 
 export async function getErc8004Agents(): Promise<AgentSummary[]> {

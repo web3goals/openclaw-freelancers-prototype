@@ -4,6 +4,7 @@ import {
   getErc8004AgentExplorerLink,
   getErc8004AgentReputationSummary,
   getErc8004Agents,
+  giveErc8004AgentFeedback,
   registerErc8004Agent,
 } from "./erc8004";
 import { getErrorString } from "./error";
@@ -137,6 +138,26 @@ export async function registerAgent(
       `[Tools] Failed to register agent, error: ${getErrorString(error)}`,
     );
     return `Failed to register agent, error: ${getErrorString(error)}`;
+  }
+}
+
+export async function giveAgentFeedback(
+  agentId: string,
+  value: number,
+): Promise<string> {
+  try {
+    logger.info(
+      `[Tools] Giving feedback to agent, agentId: ${agentId}, value: ${value}...`,
+    );
+
+    const feedback = await giveErc8004AgentFeedback(agentId, value);
+
+    return JSON.stringify(feedback);
+  } catch (error) {
+    logger.error(
+      `[Tools] Failed to give feedback to agent, error: ${getErrorString(error)}`,
+    );
+    return `Failed to give feedback to agent, error: ${getErrorString(error)}`;
   }
 }
 
