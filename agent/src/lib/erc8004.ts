@@ -1,4 +1,5 @@
 import { AgentSummary, Feedback, RegistrationFile, SDK } from "agent0-sdk";
+import { bsc } from "viem/chains";
 import { erc8004Config } from "../config/erc8004";
 import { logger } from "./logger";
 
@@ -75,9 +76,18 @@ export function getErc8004AgentExplorerLink(
 function getSdk(privateKey?: string): SDK {
   return new SDK({
     chainId: erc8004Config.chain.id,
-    rpcUrl: erc8004Config.chain.rpcUrls.default.http[0],
+    rpcUrl: erc8004Config.chain.rpcUrls.default.http[0] as string,
     ...(privateKey ? { privateKey } : {}),
     ipfs: "pinata",
-    pinataJwt: process.env.PINATA_JWT as string,
+    pinataJwt: process.env.AGENT0_PINATA_JWT as string,
+    registryOverrides: {
+      [bsc.id]: {
+        IDENTITY: "0x8004A169FB4a3325136EB29fA0ceB6D2e539a432",
+        REPUTATION: "0x8004BAa17C55a88189AE136b182e5fdA19dE9b63",
+      },
+    },
+    subgraphOverrides: {
+      [bsc.id]: process.env.AGENT0_BSC_SUBGRAPH as string,
+    },
   });
 }
