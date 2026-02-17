@@ -8,7 +8,10 @@ import { logger } from "../lib/logger";
 async function main() {
   logger.info("[Utils] Processing jobs...");
 
-  await invokeAgent([new HumanMessage("Process jobs.")]);
+  const invokeAgentResponse = await invokeAgent([
+    new HumanMessage("Process jobs."),
+  ]);
+  logger.info(`[Utils] Response: ${JSON.stringify(invokeAgentResponse)}`);
 
   // Wait a bit before exiting to ensure all logs are saved
   await new Promise((resolve) => setTimeout(resolve, 2000));
