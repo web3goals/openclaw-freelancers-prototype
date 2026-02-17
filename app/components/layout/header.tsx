@@ -31,7 +31,7 @@ export function Header() {
         {/* Right part */}
         <div className="flex-1 flex items-center justify-end gap-4">
           <Link href={appConfig.github} target="_blank">
-            <Button variant="outline" className="px-1 py-0">
+            <Button variant="default" className="px-1 py-0">
               <GithubIcon />
               GitHub
             </Button>
