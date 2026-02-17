@@ -1,6 +1,6 @@
 import { ClassValue } from "clsx";
 
-import { Avatar, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Item,
   ItemContent,
@@ -10,7 +10,6 @@ import {
 } from "@/components/ui/item";
 import { cn } from "@/lib/utils";
 
-// TODO: Add more technologies
 export function IndexTechnologiesSection(props: { className?: ClassValue }) {
   return (
     <div className={cn(props.className)}>
@@ -22,14 +21,59 @@ export function IndexTechnologiesSection(props: { className?: ClassValue }) {
         <Item variant="outline">
           <ItemMedia variant="icon">
             <Avatar className="size-10">
+              <AvatarImage src="/images/moltbook.png" />
+              <AvatarFallback>M</AvatarFallback>
+            </Avatar>
+          </ItemMedia>
+          <ItemContent>
+            <ItemTitle>Moltbook</ItemTitle>
+            <ItemDescription className="text-wrap">
+              Social network for AI agents that facilitates communication and
+              task coordination through specialized submolts
+            </ItemDescription>
+          </ItemContent>
+        </Item>
+        <Item variant="outline">
+          <ItemMedia variant="icon">
+            <Avatar className="size-10">
+              <AvatarImage src="/images/bnbchain.png" />
+              <AvatarFallback>B</AvatarFallback>
+            </Avatar>
+          </ItemMedia>
+          <ItemContent>
+            <ItemTitle>BNBChain</ItemTitle>
+            <ItemDescription className="text-wrap">
+              Blockchain network where agent identities are registered and their
+              global reputation is recorded onchain
+            </ItemDescription>
+          </ItemContent>
+        </Item>
+        <Item variant="outline">
+          <ItemMedia variant="icon">
+            <Avatar className="size-10">
+              <AvatarImage src="/images/erc8004.png" />
+              <AvatarFallback>E</AvatarFallback>
+            </Avatar>
+          </ItemMedia>
+          <ItemContent>
+            <ItemTitle>ERC-8004</ItemTitle>
+            <ItemDescription className="text-wrap">
+              Identity standard for AI agents that enables onchain registration,
+              discovery, and global reputation tracking
+            </ItemDescription>
+          </ItemContent>
+        </Item>
+        <Item variant="outline">
+          <ItemMedia variant="icon">
+            <Avatar className="size-10">
               <AvatarImage src="/images/langchain.png" />
+              <AvatarFallback>L</AvatarFallback>
             </Avatar>
           </ItemMedia>
           <ItemContent>
             <ItemTitle>LangChain</ItemTitle>
             <ItemDescription className="text-wrap">
-              A framework used to build and orchestrate agent logic and
-              workflows
+              Framework used to build and orchestrate agent logic and workflows
             </ItemDescription>
           </ItemContent>
         </Item>
@@ -37,12 +81,13 @@ export function IndexTechnologiesSection(props: { className?: ClassValue }) {
           <ItemMedia variant="icon">
             <Avatar className="size-10">
               <AvatarImage src="/images/openrouter.png" />
+              <AvatarFallback>O</AvatarFallback>
             </Avatar>
           </ItemMedia>
           <ItemContent>
             <ItemTitle>OpenRouter</ItemTitle>
             <ItemDescription className="text-wrap">
-              A unified provider for large language models
+              Unified provider for large language models
             </ItemDescription>
           </ItemContent>
         </Item>
