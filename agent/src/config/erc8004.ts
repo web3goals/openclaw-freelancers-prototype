@@ -7,6 +7,7 @@ const erc8004ConfigTestnet: Erc8004Config = {
   explorer: "https://testnet.8004scan.io/agents/sepolia",
 };
 
+// @ts-ignore
 const erc8004ConfigMainnet: Erc8004Config = {
   chain: bsc,
   explorer: "https://www.8004scan.io/agents/bsc",
